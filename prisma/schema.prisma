@@ -1,0 +1,55 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id         String     @id @default(uuid())
+    prename    String
+    name       String
+    phone      String
+    email      String     @unique
+    hash       String
+    Drivelogs  Drivelog[]
+    created_at DateTime   @default(now())
+    updated_at DateTime   @updatedAt
+}
+
+model Drivelog {
+    id            String   @id @default(uuid())
+    date          DateTime
+    triplength    Float
+    comment       String
+    vehicle       Vehicle  @relation(fields: [vehicle_plate], references: [plate])
+    vehicle_plate String
+    user          User     @relation(fields: [uid], references: [id])
+    uid           String
+    created_at    DateTime @default(now())
+    updated_at    DateTime @updatedAt
+}
+
+model DrivelogError {
+    id              String   @id @default(uuid())
+    date            DateTime
+    expectedMileage Float
+    actualMileage   Float
+    triplength      Float
+    vehicle         Vehicle  @relation(fields: [vehicle_plate], references: [plate])
+    vehicle_plate   String
+    created_at      DateTime @default(now())
+    updated_at      DateTime @updatedAt
+}
+
+model Vehicle {
+    plate         String          @id
+    name          String
+    mileage       Float           @default(0)
+    drivelogs     Drivelog[]
+    DrivelogError DrivelogError[]
+    created_at    DateTime        @default(now())
+    updated_at    DateTime        @updatedAt
+}
